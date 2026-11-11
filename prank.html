@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Важное сообщение</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; width:100%; min-height:100%; overflow:hidden; }
+  body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color:#f6f7ff; background:#080915; }
+  body::before { content:""; position:fixed; inset:-50%; z-index:-1; background:radial-gradient(circle at 32% 42%, #4537a34d, transparent 32%),radial-gradient(circle at 70% 68%, #007cff35, transparent 29%),#080915; animation: drift 9s ease-in-out infinite alternate; }
+  @keyframes drift { to { transform:translate(4%, -3%) rotate(10deg); } }
+  .stage { display:grid; place-items:center; position:absolute; inset:0; padding:24px; }
+  #loading { transition:opacity .6s, transform .6s; }
+  .panel { width:min(460px,100%); padding:42px 32px; border:1px solid #ffffff24; background:#ffffff0a; border-radius:28px; box-shadow:0 24px 100px #0008; backdrop-filter:blur(18px); text-align:center; }
+  .orb { width:74px; height:74px; border-radius:23px; margin:0 auto 26px; display:grid; place-items:center; background:linear-gradient(135deg,#7466ff,#38bcff); box-shadow:0 0 58px #655fff72; animation:pulse 1.7s ease-in-out infinite; font-size:32px; }
+  @keyframes pulse { 50% { transform:scale(1.08); box-shadow:0 0 90px #655fff99; } }
+  h1 {font-size:clamp(22px,4vw,30px); letter-spacing:-.04em; margin:0 0 10px;}
+  p {color:#b0b5d0; margin:0 0 30px; font-size:14px;}
+  .track { height:8px; width:100%; overflow:hidden; background:#ffffff1c; border-radius:999px; }
+  .fill { width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#7860ff,#47d8ff); box-shadow:0 0 20px #6aaaff88; }
+  .meta { display:flex; justify-content:space-between; margin-top:13px; font-size:12px; color:#a7abc9; font-variant-numeric:tabular-nums; }
+  #reveal { opacity:0; visibility:hidden; transform:scale(.85); transition:opacity .8s ease, transform .85s cubic-bezier(.19,1,.22,1), visibility .8s; text-align:center; }
+  #reveal.show {opacity:1; visibility:visible; transform:scale(1);}
+  #reveal h2 {font-size:clamp(52px,11vw,155px); line-height:1.05; letter-spacing:-.07em; margin:0; font-weight:1000; text-shadow:0 10px 70px #a07aff60; background:linear-gradient(100deg,#fff,#b9a8ff 45%,#68dcff); background-clip:text; -webkit-background-clip:text; color:transparent; }
+  #reveal .heart { display:block; margin-top:18px; font-size:clamp(48px,8vw,100px); color:#ff72b6; filter:drop-shadow(0 0 25px #ff4aa488); animation:bounce 1.3s ease-in-out infinite; }
+  @keyframes bounce {50%{transform:scale(1.14) rotate(-8deg)}}
+  .confetti {position:fixed; top:-30px; width:9px; height:18px; border-radius:2px; opacity:0; pointer-events:none; animation:fall 3.6s linear forwards;}
+  @keyframes fall { 10%{opacity:1} 90%{opacity:1} 100%{transform:translate3d(var(--sway),110vh,0) rotate(var(--spin)); opacity:0;} }
+  @media (prefers-reduced-motion: reduce) { body::before,.orb,#reveal .heart {animation:none} }
+</style>
+</head>
+<body>
+<section id="loading" class="stage" aria-label="Загрузка">
+  <div class="panel">
+    <div class="orb">✦</div>
+    <h1>Подготавливаем сюрприз</h1>
+    <p id="status">Проверяем важные данные…</p>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="meta"><span>Секретное сообщение</span><span id="percent">0%</span></div>
+  </div>
+</section>
+<section id="reveal" class="stage" aria-live="polite">
+  <div><h2>ИДИ НАХУЙ</h2><span class="heart">&lt;3</span></div>
+</section>
+<script>
+  const fill=document.getElementById('fill'), percent=document.getElementById('percent'), status=document.getElementById('status');
+  const start=performance.now(), duration=4300;
+  function tick(now){
+    const t=Math.min((now-start)/duration,1);
+    const progress=Math.round((1-Math.pow(1-t,1.35))*100);
+    fill.style.width=progress+'%'; percent.textContent=progress+'%';
+    status.textContent=t<.34?'Проверяем важные данные…':t<.72?'Расшифровываем сообщение…':'Почти готово…';
+    if(t<1){requestAnimationFrame(tick);return;}
+    const loading=document.getElementById('loading'), reveal=document.getElementById('reveal');
+    loading.style.opacity='0';loading.style.transform='scale(1.05)';loading.style.pointerEvents='none';
+    setTimeout(()=>{loading.style.display='none';reveal.classList.add('show');confetti();},550);
+  }
+  function confetti(){
+    const colors=['#a18bff','#4dccff','#ff72b6','#fff','#72f0ca'];
+    for(let i=0;i<85;i++){
+      let el=document.createElement('i');el.className='confetti';el.style.left=Math.random()*100+'%';
+      el.style.background=colors[Math.floor(Math.random()*colors.length)];
+      el.style.setProperty('--sway',(Math.random()*500-250)+'px');el.style.setProperty('--spin',(Math.random()*1500-750)+'deg');
+      el.style.animationDelay=Math.random()*1.15+'s'; el.style.animationDuration=(2.8+Math.random()*2)+'s';
+      document.body.appendChild(el);setTimeout(()=>el.remove(),6200);
+    }
+  }
+  requestAnimationFrame(tick);
+</script>
+</body>
+</html>
